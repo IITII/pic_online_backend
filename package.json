@@ -1,0 +1,22 @@
+{
+  "name": "node_template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./App.js"
+  },
+  "keywords": [],
+  "author": "IITII",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-convert": "^1.2.0",
+    "koa-log4": "^2.3.2",
+    "koa-router": "^9.1.0",
+    "koa2-cors": "^2.0.6"
+  }
+}
