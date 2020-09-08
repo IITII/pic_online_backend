@@ -1,24 +1,23 @@
-# pic_online
+# pic_online_backend
+> Backend for pic_online  
+
+* Front: [pic_online](https://github.com/IITII/pic_online)
+* Backend: [pic_online_backend](https://github.com/IITII/pic_online_backend)
 
 ## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
+```bash
+npm install
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
+### Start
+```bash
+npm start
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Config
+
+> All configure in `./models/config.js`  
+
+### Debug
+
+> All logs will save to `./logs/log.log`  
