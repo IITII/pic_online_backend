@@ -60,8 +60,12 @@ function getFiles(dir) {
       // Only add images
       if (i.match(imgRegex) !== null) {
         let tmpString = path.relative(imgDir, filePath);
-        tmpString = tmpString.replace(/\\/g,'/');
-        tmp.push(base_dir + tmpString);
+        tmpString = tmpString.replace(/\\/g, '/');
+        tmp.push({
+          src: base_dir + tmpString,
+          href: base_dir + tmpString,
+          info: path.parse(base_dir + tmpString).name,
+        });
       }
     }
   });
