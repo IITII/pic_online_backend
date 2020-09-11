@@ -39,7 +39,7 @@ const loggerMiddleware = async (ctx, next) => {
     (ctx.socket && (ctx.socket.remoteAddress ||
       (ctx.socket.socket && ctx.socket.socket.remoteAddress)));
   let logText = `${remoteAddress} - ${ctx.method} ${ctx.status} ${ctx.url} - ${ms}ms`;
-  logger.debug(logText);
+  logger.info(logText);
 };
 module.exports = {
   logger,
