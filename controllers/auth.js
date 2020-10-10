@@ -1,6 +1,6 @@
 'use strict';
 const config = require('../models/config');
-const {logger} = require('../middlewares/logger');
+// const {logger} = require('../middlewares/logger');
 
 module.exports = (ctx, next) => {
   let data = ctx.request.body;
@@ -9,6 +9,6 @@ module.exports = (ctx, next) => {
     ctx.response.body = JSON.stringify({
       challenge: data.challenge
     });
-  next();
+  return next();
 }
 
