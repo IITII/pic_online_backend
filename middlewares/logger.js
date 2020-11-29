@@ -1,11 +1,6 @@
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const config = require("../models/config");
-const log4js = require('koa-log4');
-const utils = require('../lib/utils');
-const logger = log4js.getLogger(config.log.logName);
-
+const fs = require('fs'), path = require('path'), config = require("../models/config"), log4js = require('koa-log4'),
+  utils = require('../lib/utils'), logger = log4js.getLogger(config.log.logName);
 logger.level = (config.log.level || "debug");
 // 这个是判断是否有logs目录，没有就新建，用来存放日志
 const logsDir = path.parse(config.log.logPath).dir;

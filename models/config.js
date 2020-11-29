@@ -4,11 +4,13 @@ let config = {
   port: 3000,
   // images dir
   pic_dir: process.env.PIC_DIR || path.resolve(__dirname, '../tmp'),
-  // basedir, you can put a basic url at here
-  base_dir: process.env.PIC_BASE_DIR || 'http://localhost/pic/',
+  // basedir, you can put a site dir at here
+  base_dir: process.env.PIC_BASE_DIR || path.resolve(__dirname, '../tmp'),
+  prefix: 'http://baidu.com',
   log: {
     logName: 'Pic_Online',
-    logPath: path.resolve(__dirname, '../logs/log.log')
+    logPath: path.resolve(__dirname, '../logs/log.log'),
+    level: process.env.LOGGER_LEVEL || 'debug'
   },
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
@@ -25,7 +27,7 @@ let config = {
     // emits a change event rather than unlink then add. If the default of
     // 100 ms does not work well for you, you can override it by setting
     // atomic to a custom value, in milliseconds.
-    atomic: process.env.PIC_ATOMIC || 2000,
+    atomic: 2000,
     // awaitWriteFinish (default: false). By default, the add event will
     // fire when a file first appears on disk, before the entire file
     // has been written. Furthermore, in some cases some change events
@@ -45,10 +47,10 @@ let config = {
       // awaitWriteFinish.stabilityThreshold (default: 2000).
       // Amount of time in milliseconds for a file size to remain
       // constant before emitting its event.
-      stabilityThreshold: process.env.PIC_THRE_SHOLD || 2000,
+      stabilityThreshold: 10000,
       // awaitWriteFinish.pollInterval (default: 100). File size
       // polling interval, in milliseconds.
-      pollInterval: process.env.PIC_POLL_INTERVAL || 500,
+      pollInterval: 500,
     }
   }
 }

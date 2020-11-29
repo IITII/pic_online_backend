@@ -4,6 +4,8 @@ example/
 models/config.json
 .vs
 .vscode
+# MacOS
+.DS_Store
 
 # Logs
 logs
