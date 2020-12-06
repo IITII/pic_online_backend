@@ -6,7 +6,7 @@ logger.level = (config.log.level || "debug");
 const logsDir = path.parse(config.log.logPath).dir;
 if (!fs.existsSync(logsDir)) {
   utils.mkdir(logsDir, () => {
-    console.log("Create un-exist path: " + logsDir)
+    console.log("Create un-exist dir: " + logsDir)
   });
 }
 // 配置log4.js

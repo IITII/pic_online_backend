@@ -3,7 +3,10 @@
  * @date 2020/11/22 22:07
  */
 'use strict';
-const path = require('path'), {logger} = require('../middlewares/logger'), cluster = require('cluster')
+const path = require('path'),
+  data_validation = require('../lib/data_validation'),
+  {logger} = require('../middlewares/logger'),
+  cluster = require('cluster')
 
 let data = {
   version: 0,
@@ -56,13 +59,24 @@ function getTree(ctx) {
 }
 
 function getMoreImages(ctx) {
-  let mediaArray = data.fileInfo.nodeKeyMap.get(ctx.request.nodeKey);
-  if (mediaArray == null) {
-    ctx.response.code = 404
-    ctx.response.body = 'No such nodeKey!!!'
+  const req_body = ctx.request.body
+  if (data_validation.private_pic(req_body)) {
+    
+    const nodeKey = parseInt(req_body.nodeKey),
+      low = parseInt(req_body.low),
+      high = parseInt(req_body.high)
+    
+    let mediaArray = data.fileInfo.nodeKeyMap.get(nodeKey)
+    if (mediaArray == null) {
+      ctx.response.status = 404
+      ctx.response.body = 'No such nodeKey!!!'
+    } else {
+      ctx.response.status = 200
+      ctx.response.body = mediaArray.slice(low, high)
+    }
   } else {
-    ctx.response.code = 200
-    ctx.response.body = mediaArray.slice(ctx.request.low, ctx.request.high)
+    ctx.response.status = 406
+    ctx.response.body = "Param: nodeKey, low, high is required, please checkout your post data..."
   }
 }
 
