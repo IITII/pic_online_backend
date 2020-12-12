@@ -55,7 +55,8 @@ if (init) {
 
 
 function getTree(ctx) {
-  ctx.response.body = data.fileInfo.tree;
+  // 因为 quasar 的 tree 组件里面的 data 为数组类型的，所以需要返回一个数组
+  ctx.response.body = [].concat(data.fileInfo.tree);
 }
 
 function getMoreImages(ctx) {
