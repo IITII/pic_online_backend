@@ -11,7 +11,7 @@ let config = {
   log: {
     logName: 'Pic_Online',
     logPath: path.resolve(__dirname, '../logs/log.log'),
-    level: process.env.LOGGER_LEVEL || 'debug'
+    level: process.env.LOGGER_LEVEL || 'info'
   },
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
