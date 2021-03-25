@@ -6,7 +6,7 @@ let config = {
   pic_dir: process.env.PIC_DIR || path.resolve(__dirname, '../tmp'),
   // basedir, you can put a site dir at here
   base_dir: process.env.PIC_BASE_DIR || path.resolve(__dirname, '../tmp'),
-  prefix: 'http://localhost:8000',
+  prefix: process.env.PIC_PREFIX || 'http://localhost:8000',
   includeRegex: '\\S+\\.(jpe?g|png|gif|svg)',
   log: {
     logName: 'Pic_Online',
