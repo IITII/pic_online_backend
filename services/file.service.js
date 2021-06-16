@@ -49,7 +49,7 @@ module.exports = {
       }
     },
     pic_map: {
-      rest: 'GET /pic_map',
+      rest: 'POST /pic_map',
       cache: {
         ttl: 60 * 5
       },
@@ -86,7 +86,7 @@ module.exports = {
       }
     },
     video_map: {
-      rest: 'GET /video_map',
+      rest: 'POST /video_map',
       cache: {
         ttl: 60 * 5
       },
