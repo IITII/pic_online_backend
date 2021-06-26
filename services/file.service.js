@@ -7,7 +7,7 @@ const {debounce} = require('lodash'),
   chokidar = require('chokidar'),
   {MoleculerClientError} = require('moleculer').Errors,
   config = require('../api.config.js'),
-  {readdir} = require('../libs/utils.js')
+  {readImage, readVideo} = require('../libs/utils.js')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -55,16 +55,6 @@ module.exports = {
       },
       params: {
         nodeKey: {type: 'number', min: 1},
-        // nodeKey: {
-        //   type: 'custom', min: 1, check(v, e, s) {
-        //     const tmp = parseInt(v)
-        //     if (isNaN(tmp) || tmp < 1) {
-        //       return e.push({type: 'Error', expected: s.min, actual: v})
-        //     } else {
-        //       return tmp
-        //     }
-        //   }
-        // },
         page: {type: 'number', default: 0, min: 0},
         page_size: {type: 'number', default: 10, min: 1, max: 100}
       },
@@ -110,13 +100,13 @@ module.exports = {
   },
   methods: {
     async updateMediaInfo() {
-      const info = await readdir(config.base_dir, config.pic_dir, config.poster_dir,
-        config.prefix, config.iRegex, config.vRegex, this.logger)
+      const pic = await readImage(config.base_dir, config.pic_dir, config.prefix, config.iRegex, this.logger)
+      const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, this.logger)
       for (const k in this.settings.pic) {
-        this.settings.pic[k] = info.pic[k]
+        this.settings.pic[k] = pic[k]
       }
       for (const k in this.settings.video) {
-        this.settings.video[k] = info.video[k]
+        this.settings.video[k] = video[k]
       }
       await this.broker.cacher.clean('file.**')
     },
@@ -126,7 +116,7 @@ module.exports = {
     await this.updateMediaInfo()
     const watcher = chokidar.watch(config.pic_dir, config.chokidar)
     watcher
-      .on('all', debounce(this.updateMediaInfo, 100))
+      .on('all', debounce(this.updateMediaInfo, 500))
       .on('error', e => this.logger.error(e))
   },
   async stopped() {

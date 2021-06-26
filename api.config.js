@@ -6,7 +6,8 @@
 const path = require('path')
 module.exports = {
   // images dir
-  pic_dir: process.env.PIC_DIR || path.resolve(__dirname, './public/media'),
+  pic_dir: process.env.PIC_DIR || path.resolve(__dirname, './public/media/A/images'),
+  video_dir: process.env.VIDEO_DIR || path.resolve(__dirname, './public/media/A/video'),
   poster_dir: process.env.PIC_POSTER_DIR || path.resolve(__dirname, './public/cache'),
   // basedir, you can put a site dir at here
   base_dir: process.env.PIC_BASE_DIR || path.resolve(__dirname, './public'),

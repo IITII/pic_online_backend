@@ -2,8 +2,7 @@
 
 const ApiGateway = require('moleculer-web'),
   {UnAuthorizedError, ForbiddenError} = ApiGateway.Errors,
-  {pick} = require('lodash'),
-  {userTypeToRoles} = require('../libs/utils')
+  {pick} = require('lodash')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context

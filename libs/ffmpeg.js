@@ -39,8 +39,9 @@ async function screenshot(mediaPath, screenshotFolder) {
       return resolve(filePath)
     }
     ffmpeg(mediaPath)
-      .on('end', f => resolve(
-        path.resolve(screenshotFolder, f[0])))
+      .on('end', f => resolve(f.length > 0
+        ? path.resolve(screenshotFolder, f[0])
+        : filePath))
       .on('error', e => reject(e))
       .screenshot({
         folder: screenshotFolder,
