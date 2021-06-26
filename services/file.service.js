@@ -22,9 +22,6 @@ module.exports = {
   actions: {
     pic_tree: {
       rest: 'GET /pic_tree',
-      cache: {
-        ttl: 60 * 5
-      },
       handler() {
         const tree = this.settings.pic.tree
         if (!tree) {
@@ -36,9 +33,6 @@ module.exports = {
     },
     video_tree: {
       rest: 'GET /video_tree',
-      cache: {
-        ttl: 60 * 5
-      },
       handler() {
         const tree = this.settings.video.tree
         if (!tree) {
@@ -50,9 +44,6 @@ module.exports = {
     },
     pic_map: {
       rest: 'POST /pic_map',
-      cache: {
-        ttl: 60 * 5
-      },
       params: {
         nodeKey: {type: 'number', min: 1},
         page: {type: 'number', default: 0, min: 0},
@@ -77,9 +68,6 @@ module.exports = {
     },
     video_map: {
       rest: 'POST /video_map',
-      cache: {
-        ttl: 60 * 5
-      },
       params: {
         nodeKey: {type: 'number', min: 1},
         page: {type: 'number', default: 0, min: 0},
@@ -99,24 +87,30 @@ module.exports = {
     },
   },
   methods: {
-    async updateMediaInfo() {
+    async updatePicInfo() {
       const pic = await readImage(config.base_dir, config.pic_dir, config.prefix, config.iRegex, this.logger)
-      const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, this.logger)
       for (const k in this.settings.pic) {
         this.settings.pic[k] = pic[k]
       }
+    },
+    async updateVideoInfo() {
+      const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, this.logger)
       for (const k in this.settings.video) {
         this.settings.video[k] = video[k]
       }
-      await this.broker.cacher.clean('file.**')
     },
   },
   events: {},
   async started() {
-    await this.updateMediaInfo()
-    const watcher = chokidar.watch(config.pic_dir, config.chokidar)
-    watcher
-      .on('all', debounce(this.updateMediaInfo, 500))
+    await this.updatePicInfo()
+    await this.updateVideoInfo()
+    const pic = chokidar.watch(config.pic_dir, config.chokidar)
+    const video = chokidar.watch(config.video_dir, config.chokidar)
+    pic
+      .on('all', debounce(this.updatePicInfo, 500))
+      .on('error', e => this.logger.error(e))
+    video
+      .on('all', debounce(this.updateVideoInfo, 1000))
       .on('error', e => this.logger.error(e))
   },
   async stopped() {

@@ -12,14 +12,13 @@ module.exports = {
   // basedir, you can put a site dir at here
   base_dir: process.env.PIC_BASE_DIR || path.resolve(__dirname, './public'),
   prefix: process.env.PIC_PREFIX || 'http://localhost:8000',
-  includeRegex: '\\S+\\.(jpe?g|png|gif|svg)',
   iRegex: /\S+\.(jpe?g|png|webp|gif|svg)/,
   vRegex: /\S+\.(mp4|MP4|mkv|MKV|flv|FLV|avi|AVI)/,
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
   chokidar: {
     // ignore dotfiles
-    ignored: /(^|[/\\])\../,
+    ignored: /((^|[/\\])\..|\S+\.(txt|log|js|ts|mp3|DS_Store|sh|docker_file|yml))/,
     ignoreInitial: true,
     depth: 99,
     ignorePermissionErrors: false,

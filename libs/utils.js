@@ -96,6 +96,9 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
  * @param logger logger
  */
 async function read_files(dir, regex, mediaFunc, logger = console) {
+  if (typeof regex === 'string') {
+    regex = new RegExp(regex)
+  }
   let nodeKey = 0,
     nodeKeyMap = new Map(),
     // total file count
