@@ -12,8 +12,8 @@ module.exports = {
   // basedir, you can put a site dir at here
   base_dir: process.env.PIC_BASE_DIR || path.resolve(__dirname, './public'),
   prefix: process.env.PIC_PREFIX || 'http://localhost:8000',
-  iRegex: /\S+\.(jpe?g|png|webp|gif|svg)/,
-  vRegex: /\S+\.(mp4|MP4|mkv|MKV|flv|FLV|avi|AVI)/,
+  iRegex: /\S+\.(jpe?g|png|webp|gif|svg)/i,
+  vRegex: /\S+\.(mp4|mkv|flv|avi)/i,
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
   chokidar: {
