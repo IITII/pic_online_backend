@@ -3,8 +3,10 @@
  * @date 2021/05/23 12:52
  */
 'use strict'
+const fs = require('fs')
 const path = require('path')
-module.exports = {
+
+let config = {
   // images dir
   pic_dir: process.env.PIC_DIR || path.resolve(__dirname, './public/media/A/images'),
   video_dir: process.env.VIDEO_DIR || path.resolve(__dirname, './public/media/A/video'),
@@ -14,6 +16,12 @@ module.exports = {
   prefix: process.env.PIC_PREFIX || 'http://localhost:8000',
   iRegex: /\S+\.(jpe?g|png|webp|gif|svg)/i,
   vRegex: /\S+\.(mp4|mkv|flv|avi)/i,
+  moleculer: {
+    https: {
+      key: process.env.MOLECULER_HTTPS_KEY,
+      cert: process.env.MOLECULER_HTTPS_CERT,
+    },
+  },
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
   chokidar: {
@@ -33,6 +41,15 @@ module.exports = {
       // awaitWriteFinish.pollInterval (default: 100). File size
       // polling interval, in milliseconds.
       pollInterval: 500,
-    }
-  }
+    },
+  },
 }
+
+if (fs.existsSync(config.moleculer.https.key) && fs.existsSync(config.moleculer.https.cert)) {
+  config.moleculer.https.key = fs.readFileSync(config.moleculer.https.key)
+  config.moleculer.https.cert = fs.readFileSync(config.moleculer.https.cert)
+} else {
+  config.moleculer.https = false
+}
+
+module.exports = config
