@@ -16,6 +16,12 @@ Usage:
 0x -o index.js
 ```
 
+> for pwsh users, switch to CMD at first or run with `npx` 
+> 
+```
+npx 0x -o index.js
+```
+
 > 以下内容来自 moleculer 的 profiling.md  
 > https://github.com/moleculerjs/moleculer/blob/master/docs/profiling.md?plain=1  
 > 

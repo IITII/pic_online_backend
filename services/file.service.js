@@ -29,7 +29,7 @@ module.exports = {
         } else {
           return [tree]
         }
-      }
+      },
     },
     video_tree: {
       rest: 'GET /video_tree',
@@ -40,14 +40,14 @@ module.exports = {
         } else {
           return [tree]
         }
-      }
+      },
     },
     pic_map: {
       rest: 'POST /pic_map',
       params: {
         nodeKey: {type: 'number', min: 1},
         page: {type: 'number', default: 0, min: 0},
-        page_size: {type: 'number', default: 10, min: 1, max: 100}
+        page_size: {type: 'number', default: 10, min: 1, max: 100},
       },
       async handler(ctx) {
         const {nodeKey, page, page_size} = ctx.params,
@@ -64,14 +64,14 @@ module.exports = {
             // video: undefined
           }
         })
-      }
+      },
     },
     video_map: {
       rest: 'POST /video_map',
       params: {
         nodeKey: {type: 'number', min: 1},
         page: {type: 'number', default: 0, min: 0},
-        page_size: {type: 'number', default: 10, min: 1, max: 100}
+        page_size: {type: 'number', default: 10, min: 1, max: 100},
       },
       async handler(ctx) {
         const {nodeKey, page, page_size} = ctx.params,
@@ -83,7 +83,7 @@ module.exports = {
           start = page_size * page,
           end = page_size * (page + 1)
         return arr.slice(start, end)
-      }
+      },
     },
   },
   methods: {
@@ -99,20 +99,35 @@ module.exports = {
         this.settings.video[k] = video[k]
       }
     },
+    getDirAndFileCount(nodeKeyMap) {
+      const dirs = nodeKeyMap.size
+      const files = [...nodeKeyMap.values()].map(_ => _.length).reduce((p, c) => p + c, 0)
+      return dirs + files
+    },
   },
   events: {},
   async started() {
     await this.updatePicInfo()
     await this.updateVideoInfo()
-    const pic = chokidar.watch(config.pic_dir, config.chokidar)
-    const video = chokidar.watch(config.video_dir, config.chokidar)
-    pic
-      .on('all', debounce(this.updatePicInfo, 500))
-      .on('error', e => this.logger.error(e))
-    video
-      .on('all', debounce(this.updateVideoInfo, 1000))
-      .on('error', e => this.logger.error(e))
+    let imgCount = this.getDirAndFileCount(this.settings.pic.nodeKeyMap)
+    let videoCount = this.getDirAndFileCount(this.settings.video.nodeKeyMap)
+    if (imgCount < config.watchLimit.imgMax) {
+      const pic = chokidar.watch(config.pic_dir, config.chokidar)
+      pic
+        .on('all', debounce(this.updatePicInfo, 500))
+        .on('error', e => this.logger.error(e))
+    } else {
+      this.logger.warn(`文件过多， 不监听文件变化。MAX: ${config.watchLimit.imgMax} => CUR: ${imgCount}`)
+    }
+    if (videoCount < config.watchLimit.videoMax) {
+      const video = chokidar.watch(config.video_dir, config.chokidar)
+      video
+        .on('all', debounce(this.updateVideoInfo, 1000))
+        .on('error', e => this.logger.error(e))
+    } else {
+      this.logger.warn(`文件过多， 不监听文件变化。MAX: ${config.watchLimit.videoMax} => CUR: ${videoCount}`)
+    }
   },
   async stopped() {
-  }
+  },
 }

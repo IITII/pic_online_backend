@@ -175,10 +175,10 @@ function absPathToHttp(absPath, baseDir, prefix) {
 }
 
 function encode_url(url) {
-  if (process.env.PIC_ENCODE_URL === 'true') {
-    return encodeURI(url)
-  } else {
+  if (process.env.PIC_ENCODE_URL !== 'false') {
     return url
+  } else {
+    return encodeURI(url)
   }
 }
 
