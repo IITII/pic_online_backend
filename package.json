@@ -4,7 +4,7 @@
   "description": "My Moleculer-based microservices project",
   "scripts": {
     "dev": "moleculer-runner --repl --hot services/**/*.service.js",
-    "start": "moleculer-runner",
+    "start": "moleculer-runner services/**/*.service.js",
     "cli": "moleculer connect Redis",
     "ci": "jest --watch",
     "test": "jest --coverage",
@@ -19,6 +19,7 @@
   ],
   "author": "IITII <ccmejx@gmail.com>",
   "devDependencies": {
+    "0x": "^5.4.1",
     "eslint": "^7.23.0",
     "jest": "^26.6.3",
     "jest-cli": "^26.6.3",

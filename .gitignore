@@ -11,6 +11,7 @@ public/*
 data/*
 !data/.gitkeep
 package-lock.json
+*.0x
 
 # MacOS
 .DS_Store
