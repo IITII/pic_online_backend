@@ -117,7 +117,7 @@ module.exports = {
         .on('all', debounce(this.updatePicInfo, 500))
         .on('error', e => this.logger.error(e))
     } else {
-      this.logger.warn(`文件过多， 不监听文件变化。MAX: ${config.watchLimit.imgMax} => CUR: ${imgCount}`)
+      this.logger.warn(`图片过多， 不监听文件变化。MAX: ${config.watchLimit.imgMax} => CUR: ${imgCount}`)
     }
     if (videoCount < config.watchLimit.videoMax) {
       const video = chokidar.watch(config.video_dir, config.chokidar)
@@ -125,7 +125,7 @@ module.exports = {
         .on('all', debounce(this.updateVideoInfo, 1000))
         .on('error', e => this.logger.error(e))
     } else {
-      this.logger.warn(`文件过多， 不监听文件变化。MAX: ${config.watchLimit.videoMax} => CUR: ${videoCount}`)
+      this.logger.warn(`视频过多， 不监听文件变化。MAX: ${config.watchLimit.videoMax} => CUR: ${videoCount}`)
     }
   },
   async stopped() {
