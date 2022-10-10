@@ -182,18 +182,23 @@ function encode_url(url) {
   }
 }
 
-function computedTime(startTime) {
-  const total = new Date() - startTime,
-    level = [1000, 1000 * 60, 1000 * 60 * 60,]
-  if (total < level[0]) {
-    return total + 'ms'
-  } else if (total < level[1]) {
-    return (level[0]).toFixed(2) + 's'
-  } else if (total < level[2]) {
-    return (total / level[1]).toFixed(2) + 'min'
-  } else {
-    return (total / level[2]).toFixed(2) + 'h'
-  }
+function computedTime(startTime, frac = 2) {
+  let time = new Date() - startTime
+  const seconds = 1000
+  const units = [
+    {unit: 'd', value: 24 * 60 * 60 * seconds},
+    {unit: 'h', value: 60 * 60 * seconds},
+    {unit: 'm', value: 60 * seconds},
+  ]
+  let res = ''
+  units.forEach(u => {
+    if (time >= u.value) {
+      res += `${Math.floor(time / u.value)}${u.unit}`
+      time %= u.value
+    }
+  })
+  res += `${(time / seconds).toFixed(frac)}s`
+  return res
 }
 
 module.exports = {
