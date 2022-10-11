@@ -85,6 +85,12 @@ module.exports = {
         return arr.slice(start, end)
       },
     },
+    reload: {
+      rest: '/reload',
+      async handler() {
+        return this.reload()
+      }
+    }
   },
   methods: {
     async updatePicInfo() {
@@ -104,13 +110,17 @@ module.exports = {
       const files = [...nodeKeyMap.values()].map(_ => _.length).reduce((p, c) => p + c, 0)
       return dirs + files
     },
+    async reload() {
+      await this.updatePicInfo()
+      await this.updateVideoInfo()
+      let imgCount = this.getDirAndFileCount(this.settings.pic.nodeKeyMap)
+      let videoCount = this.getDirAndFileCount(this.settings.video.nodeKeyMap)
+      return {imgCount, videoCount}
+    }
   },
   events: {},
   async started() {
-    await this.updatePicInfo()
-    await this.updateVideoInfo()
-    let imgCount = this.getDirAndFileCount(this.settings.pic.nodeKeyMap)
-    let videoCount = this.getDirAndFileCount(this.settings.video.nodeKeyMap)
+    const {imgCount, videoCount} = await this.reload()
     if (imgCount < config.watchLimit.imgMax) {
       const pic = chokidar.watch(config.pic_dir, config.chokidar)
       pic
