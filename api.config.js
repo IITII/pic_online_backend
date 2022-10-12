@@ -32,6 +32,9 @@ let config = {
   // Chokidar
   // See: https://github.com/paulmillr/chokidar
   chokidar: {
+    // https://github.com/paulmillr/chokidar/issues/849
+    // https://github.com/paulmillr/chokidar#performance
+    usePolling: true,
     // ignore dotfiles
     ignored: /((^|[/\\])\..|\S+\.(txt|log|js|ts|mp3|DS_Store|sh|docker_file|yml))/,
     ignoreInitial: true,
