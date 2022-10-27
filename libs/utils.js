@@ -117,7 +117,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
       // dir file count
       fileCount: 0, children: []
     }
-    for (const i of fs.readdirSync(dirPath)) {
+    for (const i of fs.readdirSync(dirPath).sort()) {
       filePath = dirPath + path.sep + i
       if (i.startsWith('.')) {
         continue
