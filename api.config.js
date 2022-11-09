@@ -24,9 +24,29 @@ let config = {
     videoMax: 200,
   },
   moleculer: {
+    server: {
+      auto_open: true,
+      ip: process.env.MOLECULER_IP || '0.0.0.0',
+      port: process.env.MOLECULER_PORT || 3000,
+      pathname: process.env.MOLECULER_PATHNAME || '/pic',
+    },
     https: {
       key: process.env.MOLECULER_HTTPS_KEY,
       cert: process.env.MOLECULER_HTTPS_CERT,
+    },
+    ddns: {
+      enable: process.env.MOLECULER_DDNS_ENABLE || false,
+      domain: process.env.MOLECULER_DDNS_DOMAIN || '',
+      token: process.env.MOLECULER_DDNS_TOKEN || '',
+    }
+  },
+  axios: {
+    // baseURL: 'https://api.telegram.org/bot',
+    // proxy: process.env.PROXY,
+    proxy: undefined,
+    timeout: 1000 * 10,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36',
     },
   },
   // Chokidar
@@ -60,6 +80,15 @@ if (fs.existsSync(config.moleculer.https.key) && fs.existsSync(config.moleculer.
   config.moleculer.https.cert = fs.readFileSync(config.moleculer.https.cert)
 } else {
   config.moleculer.https = false
+}
+
+let proxy = process.env.PROXY || ''
+proxy = proxy.replace(/https?:\/\//, '')
+if (proxy) {
+  config.axios.proxy = {
+    host: proxy.split(':')[0],
+    port: proxy.split(':')[1],
+  }
 }
 
 module.exports = config

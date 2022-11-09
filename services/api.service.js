@@ -3,7 +3,7 @@
 const ApiGateway = require('moleculer-web'),
   {UnAuthorizedError, ForbiddenError} = ApiGateway.Errors,
   {pick} = require('lodash')
-const {moleculer} = require('../api.config')
+const {moleculer, base_dir} = require('../api.config')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -18,10 +18,10 @@ module.exports = {
   // More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
   settings: {
     // Exposed port
-    port: process.env.PORT || 3000,
+    port: moleculer.server.port,
 
     // Exposed IP
-    ip: '0.0.0.0',
+    ip: moleculer.server.ip,
 
     https: moleculer.https,
 
@@ -197,10 +197,13 @@ module.exports = {
 
     // Serve assets from "public" folder. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Serve-static-files
     assets: {
-      folder: 'public',
+      folder: base_dir,
 
       // Options to `server-static` module
-      options: {},
+      options: {
+        dotfiles: 'ignore', maxAge: '1d',
+        index: ['index.html', 'index.htm', 'index'],
+      },
     },
   },
 
