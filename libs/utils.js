@@ -67,17 +67,20 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     const res = []
     for (const m of media) {
       const k = encodeURI(m)
+      let v
       if (cache.has(k)) {
-        res.push(cache.get(k))
+        v = cache.get(k)
+        v.src = replace_host(v.src, prefix)
+        v.video = replace_host(v.video, prefix)
       } else {
         const screenshot = await ffmpeg.screenshot(m, posterFolder),
           resolution = await ffmpeg.getResolution(m),
           src = absPathToHttp(screenshot, baseDir, prefix),
-          video = absPathToHttp(m, baseDir, prefix),
-          v = {src, ...resolution, video}
-        res.push(v)
-        cache.set(k, v)
+          video = absPathToHttp(m, baseDir, prefix)
+        v = {src, ...resolution, video}
       }
+      res.push(v)
+      cache.set(k, v)
     }
     fs.writeFileSync(cacheFilePath, JSON.stringify(Object.fromEntries(cache)))
     return res
@@ -86,6 +89,14 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
   const info = await read_files(dir, vRegex, func, logger)
   logger.warn(`Deal finish, time: ${computedTime(startTime)}`)
   return info
+}
+
+function replace_host(pre, target) {
+  let t1, pu
+  t1 = new URL(target).host
+  pu = new URL(pre)
+  pu.host = t1
+  return pu.toString()
 }
 
 /**
