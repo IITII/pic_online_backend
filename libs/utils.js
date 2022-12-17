@@ -66,7 +66,9 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     media = media.sort(sortVideo)
     const res = []
     for (const m of media) {
-      const k = encodeURI(m)
+      const reg = new RegExp(path.sep, 'g'),
+        relative_video = path.relative(baseDir, m).replace(reg, '/'),
+        k = encodeURI(relative_video)
       let v
       if (cache.has(k)) {
         v = cache.get(k)
@@ -157,7 +159,7 @@ function checkDir(dir) {
   if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
     return true
   } else {
-    throw new Error('No such file or directory!')
+    throw new Error(`No such file or directory: ${dir}`)
   }
 }
 
