@@ -25,7 +25,7 @@ let config = {
   },
   moleculer: {
     server: {
-      auto_open: true,
+      auto_open: process.env.MOLECULER_AUTO_OPEN === 'true',
       ip: process.env.MOLECULER_IP || '0.0.0.0',
       port: process.env.MOLECULER_PORT || 3000,
       pathname: process.env.MOLECULER_PATHNAME || '/pic',
