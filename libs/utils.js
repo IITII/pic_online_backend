@@ -25,7 +25,6 @@ async function readImage(baseDir, dir, prefix, iRegex, logger = console) {
   function func(media) {
     return media.sort(sortImage)
       .map(_ => absPathToHttp(_, baseDir, prefix))
-      .map(_ => encode_url(_))
   }
 
   const info = await read_files(dir, iRegex, func, logger)
@@ -191,7 +190,7 @@ function absPathToHttp(absPath, baseDir, prefix) {
   res = prefix
   res += path.relative(baseDir, absPath)
     .replace(/\\/g, '/')
-  return encodeURI(res)
+  return encode_url(res)
 }
 
 function encode_url(url) {
