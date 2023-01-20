@@ -187,9 +187,11 @@ function sortVideo(a, b) {
 }
 
 function absPathToHttp(absPath, baseDir, prefix) {
-  return prefix +
-    path.relative(baseDir, absPath)
-      .replace(/\\/g, '/')
+  let res
+  res = prefix
+  res += path.relative(baseDir, absPath)
+    .replace(/\\/g, '/')
+  return encodeURI(res)
 }
 
 function encode_url(url) {
