@@ -1,3 +1,7 @@
+# env
+.env
+env.sh
+env.js
 # Logs
 logs
 *.log
