@@ -135,13 +135,18 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
       if (i.startsWith('.')) {
         continue
       }
-      if (fs.statSync(filePath).isDirectory()) {
-        dirCount++
-        files.children.push(await dfs(filePath))
-      } else if (i.match(regex) !== null) {
-        fileCount++
-        files.fileCount++
-        media.push(filePath)
+      try {
+        if (fs.statSync(filePath).isDirectory()) {
+          dirCount++
+          files.children.push(await dfs(filePath))
+        } else if (i.match(regex) !== null) {
+          fileCount++
+          files.fileCount++
+          media.push(filePath)
+        }
+      } catch (e) {
+        logger.warn(`process '${filePath}' failed, maybe current file system don't support some char...`)
+        logger.debug(e)
       }
     }
     media = await mediaFunc(media)
@@ -214,14 +219,7 @@ function computedTime(startTime, frac = 2) {
   return res
 }
 
-function uuid_gen(len = 32) {
-  let res
-  res = uuidv4().replace(/-/g, '')
-  return res.substring(0, len)
-}
-
 module.exports = {
   readImage,
   readVideo,
-  uuid_gen,
 }

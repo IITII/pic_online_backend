@@ -6,7 +6,7 @@
 const fs = require('fs'),
   path = require('path'),
   ffmpeg = require('fluent-ffmpeg'),
-  {uuid_gen} = require('./utils.js')
+  {v4: uuidv4} = require('uuid')
 
 async function getResolution(mediaPath) {
   return await new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ async function screenshot(mediaPath, screenshotFolder) {
   return await new Promise((resolve, reject) => {
     let filename, filePath
     do {
-      filename = `${uuid_gen()}.png`
+      filename = `${uuid_gen(8)}.png`
       filePath = path.resolve(screenshotFolder, filename)
     } while (fs.existsSync(filePath))
     ffmpeg(mediaPath)
@@ -50,7 +50,14 @@ async function screenshot(mediaPath, screenshotFolder) {
   })
 }
 
+function uuid_gen(len = 32) {
+  let res
+  res = uuidv4().replace(/-/g, '')
+  return res.substring(0, len)
+}
+
 module.exports = {
   getResolution,
+  uuid_gen,
   screenshot
 }
