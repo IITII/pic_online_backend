@@ -6,7 +6,7 @@
 const fs = require('fs'),
   path = require('path'),
   ffmpeg = require('fluent-ffmpeg'),
-  md5File = require('md5-file')
+  {uuid_gen} = require('./utils.js')
 
 async function getResolution(mediaPath) {
   return await new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ async function getResolution(mediaPath) {
 
 async function screenshot(mediaPath, screenshotFolder) {
   return await new Promise((resolve, reject) => {
-    const filename = `${md5File.sync(mediaPath)}.png`
+    const filename = `${uuid_gen()}.png`
     const filePath = path.resolve(screenshotFolder, filename)
     if (fs.existsSync(filePath)) {
       return resolve(filePath)

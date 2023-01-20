@@ -5,6 +5,7 @@
 'use strict'
 const fs = require('fs'),
   path = require('path'),
+  {uuidv4} = require('uuid'),
   ffmpeg = require('../libs/ffmpeg.js')
 
 /**
@@ -66,8 +67,7 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     media = media.sort(sortVideo)
     const res = []
     for (const m of media) {
-      const reg = new RegExp(path.sep, 'g'),
-        relative_video = path.relative(baseDir, m).replace(reg, '/'),
+      const relative_video = path.relative(baseDir, m).replace(/[\\/]/g, '/'),
         k = encodeURI(relative_video)
       let v
       if (cache.has(k)) {
@@ -214,7 +214,14 @@ function computedTime(startTime, frac = 2) {
   return res
 }
 
+function uuid_gen(len = 32) {
+  let res
+  res = uuidv4().replace(/-/g, '')
+  return res.substring(0, len)
+}
+
 module.exports = {
   readImage,
   readVideo,
+  uuid_gen,
 }
