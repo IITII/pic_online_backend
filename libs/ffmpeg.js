@@ -33,11 +33,11 @@ async function getResolution(mediaPath) {
 
 async function screenshot(mediaPath, screenshotFolder) {
   return await new Promise((resolve, reject) => {
-    const filename = `${uuid_gen()}.png`
-    const filePath = path.resolve(screenshotFolder, filename)
-    if (fs.existsSync(filePath)) {
-      return resolve(filePath)
-    }
+    let filename, filePath
+    do {
+      filename = `${uuid_gen()}.png`
+      filePath = path.resolve(screenshotFolder, filename)
+    } while (fs.existsSync(filePath))
     ffmpeg(mediaPath)
       .on('end', f => resolve(f.length > 0
         ? path.resolve(screenshotFolder, f[0])
