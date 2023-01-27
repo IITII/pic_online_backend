@@ -31,6 +31,21 @@ module.exports = {
         }
       },
     },
+    // pic_tree: {
+    //   rest: 'GET /pic_tree',
+    //   handler() {
+    //     let tree = JSON.parse(JSON.stringify(this.settings.pic.tree))
+    //     if (!tree) {
+    //       throw new MoleculerClientError('Please wait for a while', 500)
+    //     } else {
+    //       tree.children.forEach(c => {
+    //         c.lazy = c.dirCount > 0
+    //         c.children = []
+    //       })
+    //       return [tree]
+    //     }
+    //   },
+    // },
     video_tree: {
       rest: 'GET /video_tree',
       handler() {
@@ -41,6 +56,18 @@ module.exports = {
           return [tree]
         }
       },
+    },
+    pic_lazy: {
+      rest: 'POST /pic_lazy',
+      params: {
+        nodeKey: {type: 'string'},
+      },
+      async handler(ctx) {
+        const {nodeKey} = ctx.params,
+          tree = this.settings.pic.tree
+        let node = this.findByNodeKey(+nodeKey, tree)
+        return node.length === 0 ? [] : node.children
+      }
     },
     pic_map: {
       rest: 'POST /pic_map',
@@ -58,12 +85,7 @@ module.exports = {
         const arr = map.get(nodeKey),
           start = page_size * page,
           end = page_size * (page + 1)
-        return arr.slice(start, end).map(_ => {
-          return {
-            src: _,
-            // video: undefined
-          }
-        })
+        return arr.slice(start, end).map(_ => ({src: _}))
       },
     },
     video_map: {
@@ -93,6 +115,27 @@ module.exports = {
     }
   },
   methods: {
+    findByNodeKey(key, tree) {
+      let res = []
+      if (!tree) return res
+      if (tree.nodeKey === key) {
+        res = JSON.parse(JSON.stringify(tree))
+      } else {
+        for (const child of tree.children) {
+          res = this.findByNodeKey(key, child)
+          if (res.length !== 0) {
+            break
+          }
+        }
+      }
+      if (res.length !== 0) {
+        res.children.forEach(c => {
+          c.lazy = c.dirCount > 0
+          c.children = []
+        })
+      }
+      return res
+    },
     async updatePicInfo() {
       const pic = await readImage(config.base_dir, config.pic_dir, config.prefix, config.iRegex, this.logger)
       for (const k in this.settings.pic) {

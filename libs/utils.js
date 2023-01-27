@@ -127,6 +127,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
       nodeKey: tmpNodeKey, header: 'root',
       label: path.basename(dirPath),
       // dir file count
+      dirCount: 0,
       fileCount: 0, children: []
     }
     for (const i of fs.readdirSync(dirPath).sort()) {
@@ -137,6 +138,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
       try {
         if (fs.statSync(filePath).isDirectory()) {
           dirCount++
+          files.dirCount++
           files.children.push(await dfs(filePath))
         } else if (i.match(regex) !== null) {
           fileCount++
