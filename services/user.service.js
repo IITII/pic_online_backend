@@ -137,7 +137,7 @@ module.exports = {
         exp = new Date(today),
         // token expired time. unit: hour
         tokenExpire = process.env.JWT_TOKEN_EXPIRE || 24
-      exp.setHours(today.getHours() + tokenExpire)
+      exp.setHours(today.getHours() + +tokenExpire)
 
       return jwt.sign({
         _id: user._id,
