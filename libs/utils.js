@@ -222,7 +222,43 @@ function computedTime(startTime, frac = 2) {
   return res
 }
 
+/**
+ * 筛选特殊字符
+ * @example escape('1aA-_@中é') => 1aA-_@%u4E2D%E9
+ */
+function allowChars(str, logger = console) {
+  for (const c of str) {
+    let uni = escape(c), c16, url_max = 0x7e
+    switch (uni.length) {
+      case 1:
+        // ascii chars
+        break
+      case 3:
+        // URL encode
+        // https://blog.csdn.net/guoquanyou/article/details/3268939
+        c16 = uni.slice(1)
+        c16 = parseInt(c16, 16)
+        if (c16 > url_max) {
+          logger.warn(`URL encode char '${c}' => ${uni} is not allowed`, str)
+        }
+        break
+      case 6:
+        // unicode
+        // allow 中文 & ascii: /(\w|[\u4E00-\u9FA5])*/
+        break
+      case 12:
+        // unicode emoji
+        logger.warn(`emoji '${c}' => ${uni} is not allowed`, str)
+        break
+      default:
+        logger.warn(`char '${c}' => ${uni} too long: ${uni.length}`, str)
+        break
+    }
+  }
+}
+
 module.exports = {
   readImage,
   readVideo,
+  allowChars,
 }
