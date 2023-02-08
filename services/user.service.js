@@ -25,7 +25,7 @@ module.exports = {
   settings: {
     // Available fields in the responses
     // _id 字段为 MongoDB 自动生成的 Object 类型的主键
-    fields: ['_id', 'name', 'password', 'language', 'user_type',],
+    fields: ['_id', 'name', 'password', 'language', 'user_type'],
     JWT_SECRET: process.env.JWT_SECRET || 'jwt-pic-online-secret',
   },
 
@@ -38,8 +38,8 @@ module.exports = {
       params: {
         name: {type: 'string', min: 3, max: 10},
         password: {type: 'string', min: 1, max: 10},
-        user_type: {type: 'enum', default: 'user', values: ['admin', 'user'],},
-        language: {type: 'enum', default: 'zh-hans', values: ['zh-hans', 'en-us'],}
+        user_type: {type: 'enum', default: 'user', values: ['admin', 'user']},
+        language: {type: 'enum', default: 'zh-CN', values: ['zh-CN', 'en-us']},
       },
       async handler(ctx) {
         const entity = ctx.params,
@@ -55,7 +55,7 @@ module.exports = {
         const json = this.transformEntity(res, true, ctx.meta.token)
         await this.entityChanged('created', json, ctx)
         return json
-      }
+      },
     },
     login: {
       rest: 'POST /login',
@@ -78,22 +78,22 @@ module.exports = {
         }
 
         return this.transformEntity(user, true, ctx.meta.token)
-      }
+      },
     },
     tokenLogin: {
       rest: 'POST /login_by_token',
       cache: {
         keys: ['token'],
-        ttl: 60 * 10 // 10min
+        ttl: 60 * 10, // 10min
       },
       params: {
-        token: 'string'
+        token: 'string',
       },
       async handler(ctx) {
         const token = ctx.params.token
         const entity = await this.broker.call('user.resolveToken', {token})
         return this.transformEntity(entity, true, ctx.meta.token)
-      }
+      },
     },
     /**
      * Get user by JWT token (for API GW authentication)
@@ -106,10 +106,10 @@ module.exports = {
     resolveToken: {
       cache: {
         keys: ['token'],
-        ttl: 60 * 60 // 1 hour
+        ttl: 60 * 60, // 1 hour
       },
       params: {
-        token: 'string'
+        token: 'string',
       },
       async handler(ctx) {
         const decoded = await new this.Promise((resolve, reject) => {
@@ -119,8 +119,8 @@ module.exports = {
         })
         if (decoded._id)
           return this.getById(decoded._id)
-      }
-    }
+      },
+    },
   },
 
   /**
@@ -142,7 +142,7 @@ module.exports = {
       return jwt.sign({
         _id: user._id,
         name: user.name,
-        exp: Math.floor(exp.getTime() / 1000)
+        exp: Math.floor(exp.getTime() / 1000),
       }, this.settings.JWT_SECRET)
     },
     /**
@@ -172,17 +172,14 @@ module.exports = {
      * connection establishing & the collection is empty.
      */
     async seedDB() {
-      const users = 'admin,user'.split(',')
-        .map(u => {
-          return {
-            name: u, user_type: u,
-            language: 'zh-hans',
-            password: bcrypt.hashSync(u, 10)
-          }
-        })
+      // const users = ['admin,admin,admin', 'user,user,user']
+      const users = ['admin,admin,admin']
+        .map(_ => _.split(','))
+        .map(([name, user_type, password]) => ({
+          name, user_type, language: 'zh-CN', password: bcrypt.hashSync(password, 10),
+        }))
       await this.adapter.insertMany(users)
     },
-
   },
 
   /**
@@ -190,5 +187,5 @@ module.exports = {
    */
   async afterConnected() {
     // await this.adapter.collection.createIndex({ name: 1 });
-  }
+  },
 }
