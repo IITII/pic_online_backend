@@ -5,7 +5,6 @@
 'use strict'
 const fs = require('fs'),
   path = require('path'),
-  {uuidv4} = require('uuid'),
   ffmpeg = require('../libs/ffmpeg.js')
 
 /**
@@ -83,6 +82,15 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
       res.push(v)
       cache.set(k, v)
     }
+    cache.forEach((v, k) => {
+      const p = path.resolve(baseDir, decodeURI(k).replace(prefix, ''))
+      const vPath = path.resolve(baseDir, v.src.replace(prefix, ''))
+      if (!fs.existsSync(p) && fs.existsSync(vPath)) {
+        logger.debug(`Delete cache: ${p} -> ${vPath}`)
+        fs.unlinkSync(vPath)
+        cache.delete(k)
+      }
+    })
     fs.writeFileSync(cacheFilePath, JSON.stringify(Object.fromEntries(cache)))
     return res
   }
@@ -128,7 +136,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
       label: path.basename(dirPath),
       // dir file count
       dirCount: 0,
-      fileCount: 0, children: []
+      fileCount: 0, children: [],
     }
     for (const i of fs.readdirSync(dirPath).sort()) {
       filePath = dirPath + path.sep + i
