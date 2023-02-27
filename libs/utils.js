@@ -85,9 +85,11 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     cache.forEach((v, k) => {
       const p = path.resolve(baseDir, decodeURI(k).replace(prefix, ''))
       const vPath = path.resolve(baseDir, v.src.replace(prefix, ''))
-      if (!fs.existsSync(p) && fs.existsSync(vPath)) {
+      if (!fs.existsSync(p)) {
         logger.warn(`Delete cache: ${p} -> ${vPath}`)
-        fs.unlinkSync(vPath)
+        if (fs.existsSync(vPath)) {
+          fs.unlinkSync(vPath)
+        }
         cache.delete(k)
       }
     })
