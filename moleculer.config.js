@@ -36,7 +36,7 @@ module.exports = {
   // Enable/disable logging or use custom logger. More info: https://moleculer.services/docs/0.14/logging.html
   // Available logger types: "Console", "File", "Pino", "Winston", "Bunyan", "debug", "Log4js", "Datadog"
   logger: {
-    type: 'Console',
+    type: process.env.PIC_LOGGER_TYPE || 'Console',
     options: {
       // Using colors on the output
       colors: true,
@@ -52,7 +52,7 @@ module.exports = {
   },
   // Default log level for built-in console logger. It can be overwritten in logger options above.
   // Available values: trace, debug, info, warn, error, fatal
-  logLevel: 'info',
+  logLevel: process.env.PIC_LOGGER_LEVEL || 'info',
 
   // Define transporter.
   // More info: https://moleculer.services/docs/0.14/networking.html

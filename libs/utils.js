@@ -156,7 +156,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
           media.push(filePath)
         }
       } catch (e) {
-        logger.warn(`process '${filePath}' failed, maybe current file system don't support some char...`)
+        logger.warn(`process '${filePath}' failed, maybe current file system don't support some char...`, e.message)
         logger.debug(e)
       }
     }
