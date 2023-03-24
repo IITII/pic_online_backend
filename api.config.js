@@ -35,7 +35,7 @@ let config = {
       cert: process.env.MOLECULER_HTTPS_CERT,
     },
     ddns: {
-      enable: process.env.MOLECULER_DDNS_ENABLE || false,
+      enable: process.env.MOLECULER_DDNS_ENABLE === 'true',
       domain: process.env.MOLECULER_DDNS_DOMAIN || '',
       token: process.env.MOLECULER_DDNS_TOKEN || '',
     }
