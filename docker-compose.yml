@@ -1,0 +1,30 @@
+version: "3"
+services:
+  web:
+    image: iitii/pic_online
+    container_name: pic_online
+    hostname: pic_online
+    # 如果遇到文件权限问题，手动指定 uid，gid 启动即可
+    # UID=${UID} GID=${GID} docker-compose up
+    # user: "${UID}:${GID}"
+    restart: unless-stopped
+    # network_mode: host
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    volumes:
+      # - ./data:/pic/data
+      - ./data/user.db:/pic/data/user.db
+      # 图片
+      - ./images:/pic/data/images
+      # 视频
+      - ./video:/pic/data/video
+    ports:
+      - 8089:8089
+    environment:
+      # 修改成实际的地址
+      - NAS_DOMAIN="127.0.0.1"
+      # - PIC_BASE_DIR=/pic/data
+      # - MOLECULER_PORT=8089
+      - MOLECULER_DDNS_ENABLE=false
