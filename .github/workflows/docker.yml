@@ -10,7 +10,7 @@ on:
       - 'main'
   workflow_dispatch:
   repository_dispatch:
-  types: [webhook]
+    types: [webhook]
 
 env:
   APP_NAME: pic_online
