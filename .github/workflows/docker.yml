@@ -9,6 +9,8 @@ on:
     branches:
       - 'main'
   workflow_dispatch:
+  repository_dispatch:
+  types: [webhook]
 
 env:
   APP_NAME: pic_online
