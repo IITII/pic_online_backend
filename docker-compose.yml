@@ -14,12 +14,11 @@ services:
       options:
         max-size: 1m
     volumes:
-      # - ./data:/pic/data
-      - ./data/user.db:/pic/data/user.db
+      - ./data:/pic/data
       # 图片
-      - ./images:/pic/data/images
+      # - ./images:/pic/data/images
       # 视频
-      - ./video:/pic/data/video
+      # - ./video:/pic/data/video
     ports:
       - 8089:8089
     environment:
@@ -28,3 +27,4 @@ services:
       # - PIC_BASE_DIR=/pic/data
       # - MOLECULER_PORT=8089
       - MOLECULER_DDNS_ENABLE=false
+    # entrypoint: tail -f /pic/App.js
