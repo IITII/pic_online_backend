@@ -109,7 +109,13 @@ module.exports = {
     },
     reload: {
       rest: '/reload',
+      timeout: 0,
       async handler() {
+        // slow test
+        // function sleep(ms) {
+        //   return new Promise(resolve => setTimeout(resolve, ms));
+        // }
+        // await sleep(100 * 1000)
         return this.reload()
       }
     }
