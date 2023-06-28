@@ -126,10 +126,17 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
     // total file count
     fileCount = 0,
     dirCount = 0,
-    logInterval,
-    startTime = new Date()
+    seconds,
+    startTime = Date.now()
 
   async function dfs(dirPath) {
+    // cpu 密集时，setInterval 不会被按时调用
+    let costSec = +((Date.now() - startTime)/1000).toFixed(0)
+    if (seconds !== costSec) {
+      logger.info(`Scaning ${dir}: dir: ${dirCount}, file: ${fileCount}, curDir: ${dirPath}...`)
+      seconds = costSec
+    }
+    
     nodeKey++
     let tmpNodeKey = nodeKey,
       filePath = '',
@@ -165,12 +172,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
     nodeKeyMap.set(tmpNodeKey, media)
     return files
   }
-
-  logInterval = setInterval(() => {
-    logger.info(`Scaning ${dir}: dir: ${dirCount}, file: ${fileCount}...`)
-  }, 1000)
   const tree = await dfs(dir)
-  clearInterval(logInterval)
   logger.warn(`Read finish, time: ${computedTime(startTime)} dir: ${dirCount}, file: ${fileCount}, dir: ${dir}`)
   return {tree, nodeKeyMap}
 }
