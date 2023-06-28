@@ -14,11 +14,13 @@ services:
       options:
         max-size: 1m
     volumes:
-      - ./data:/pic/data
+      # - ./data:/pic/data
       # 图片
-      # - ./images:/pic/data/images
+      - ./data/images:/pic/data/images
       # 视频
-      # - ./video:/pic/data/video
+      - ./data/video:/pic/data/video
+      # 缓存
+      - ./data/cache:/pic/data/cache
     ports:
       - 8089:8089
     environment:
