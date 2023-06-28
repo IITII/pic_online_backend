@@ -22,9 +22,23 @@ services:
     ports:
       - 8089:8089
     environment:
-      # 修改成实际的地址
+      # 修改成实际的地址或域名, host 模式和 bridge 模式直接填宿主机 ip 即可
+      # 如果你有 dns.he.net 的 ddns 域名, 可以尝试在 host 模式下将 MOLECULER_DDNS_ENABLE 设置为 true
+      # ddns 的认证 key 需要设置成和域名一致.
+      # 服务会自动从 192, 172, 10 网段找到第一个符合要求的 ip, 并更新 ddns
       - NAS_DOMAIN="127.0.0.1"
       # - PIC_BASE_DIR=/pic/data
+      # 限定服务的监听地址, 默认 0.0.0.0
+      # - MOLECULER_IP="0.0.0.0"
       # - MOLECULER_PORT=8089
       - MOLECULER_DDNS_ENABLE=false
+      # SSL
+      # - MOLECULER_HTTPS_CERT="/pic/data/ssl/nas.baidu.com/fullchain.cer"
+      # - MOLECULER_HTTPS_KEY="/pic/data/ssl/nas.baidu.com/key.key"
+      # 以下内容一般不需要修改
+      # - PIC_DIR=$PIC_BASE_DIR/images
+      # - VIDEO_DIR=$PIC_BASE_DIR/video
+      # - PIC_POSTER_DIR=$PIC_BASE_DIR/cache
+      # 图片地址前缀, 最后的 图片/视频 地址由 前缀 和 PIC_DIR/VIDEO_DIR 到 PIC_BASE_DIR 的相对路径组成
+      # - PIC_PREFIX=http://$NAS_DOMAIN:$MOLECULER_PORT
     # entrypoint: tail -f /pic/App.js
