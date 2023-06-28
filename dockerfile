@@ -18,14 +18,15 @@ ENV JWT_TOKEN_EXPIRE=336
 # "Console": 日志输出到 std, "File": 日志输出到文件
 ENV PIC_LOGGER_TYPE=Console
 
+RUN apk update \
+&& apk add ffmpeg
+
 ADD . /pic
 WORKDIR /pic
 volume ["/pic/logs", "$PIC_BASE_DIR/images", "$PIC_BASE_DIR/video"]
 
 RUN set -x \
 && rm -rf data && mkdir data \
-&& apk update \
-&& apk add ffmpeg \
 && wget https://github.com/IITII/pic_online/releases/latest/download/pic_online_pic.zip -O /tmp/pic.zip \
 && unzip /tmp/pic.zip -d data/pic && mv data/pic/dist/spa/* data/pic/ && rm -rf data/pic/dist/ /tmp/pic.zip \
 && mkdir $PIC_BASE_DIR/images $PIC_BASE_DIR/video $PIC_BASE_DIR/cache \
