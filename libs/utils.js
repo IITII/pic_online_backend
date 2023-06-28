@@ -126,6 +126,7 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
     // total file count
     fileCount = 0,
     dirCount = 0,
+    logInterval,
     startTime = new Date()
 
   async function dfs(dirPath) {
@@ -165,7 +166,11 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
     return files
   }
 
+  logInterval = setInterval(() => {
+    logger.info(`Scaning ${dir}: dir: ${dirCount}, file: ${fileCount}...`)
+  }, 1000)
   const tree = await dfs(dir)
+  clearInterval(logInterval)
   logger.warn(`Read finish, time: ${computedTime(startTime)} dir: ${dirCount}, file: ${fileCount}, dir: ${dir}`)
   return {tree, nodeKeyMap}
 }
