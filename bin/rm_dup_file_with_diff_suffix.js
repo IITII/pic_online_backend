@@ -8,11 +8,13 @@
 
 const fs = require('fs')
 const path = require('path')
+// const failed = []
 
 let base = process.env.DUP_DIR || '.'
 base = path.resolve(base)
 
 dfs(base)
+// logger.info(`Failed to delete ${failed.length} files`)
 
 function dfs(base, keepSuffix = '.webp', logger = console) {
   logger.info(`Start to scan ${base}`)
@@ -35,7 +37,12 @@ function dfs(base, keepSuffix = '.webp', logger = console) {
         logger.info(`Keep ${keepFile}, delete others: ${v.join(', ')}`)
         v.forEach(_ => {
           let p = path.join(base, _)
-          fs.unlinkSync(p)
+          try {
+            fs.unlinkSync(p)
+          } catch (e) {
+            logger.error(`Failed to delete ${p}: ${e.message}`)
+            // failed.push({path: p, error: e.message})
+          }
         })
       } else {
         logger.info(`basename ${k} cannot found ${keepSuffix} file. keep all files: ${v.join(', ')}`)
