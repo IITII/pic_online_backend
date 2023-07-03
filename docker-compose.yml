@@ -35,6 +35,11 @@ services:
       # - MOLECULER_IP="0.0.0.0"
       # - MOLECULER_PORT=8089
       - MOLECULER_DDNS_ENABLE=false
+      # 启用缓存后, 如果想刷新缓存/获取最新的文件列表, 可以通过前端界面右上角的刷新按钮
+      # 启用图片元数据缓存
+      - IMG_CACHE=false
+      # 启用视频元数据缓存
+      - VIDEO_CACHE=false
       # SSL
       # - MOLECULER_HTTPS_CERT="/pic/data/ssl/nas.baidu.com/fullchain.cer"
       # - MOLECULER_HTTPS_KEY="/pic/data/ssl/nas.baidu.com/key.key"
