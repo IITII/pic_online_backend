@@ -8,6 +8,9 @@ const {debounce} = require('lodash'),
   {MoleculerClientError} = require('moleculer').Errors,
   config = require('../api.config.js'),
   {readImage, readVideo} = require('../libs/utils.js')
+const path = require('path')
+const {resolve} = require('url')
+const fs = require('fs')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -85,7 +88,7 @@ module.exports = {
         const arr = map.get(nodeKey),
           start = page_size * page,
           end = page_size * (page + 1)
-        return arr.slice(start, end).map(_ => ({src: _}))
+        return arr.files.slice(start, end).map(_ => ({src: this.resolveHttp(config.prefix, arr.dir, _)}))
       },
     },
     video_map: {
@@ -102,9 +105,15 @@ module.exports = {
           throw new MoleculerClientError('Please wait for a while', 500)
         }
         const arr = map.get(nodeKey),
+          self = this,
           start = page_size * page,
           end = page_size * (page + 1)
-        return arr.slice(start, end)
+        return arr.slice(start, end).map(_ => {
+          let {src, video} = _
+          src = self.resolveHttp(config.prefix, '', src)
+          video = self.resolveHttp(config.prefix, '', video)
+          return {..._, src, video}
+        })
       },
     },
     reload: {
@@ -116,11 +125,14 @@ module.exports = {
         //   return new Promise(resolve => setTimeout(resolve, ms));
         // }
         // await sleep(100 * 1000)
-        return this.reload()
+        return this.reload(false)
       }
     }
   },
   methods: {
+    resolveHttp(prefix, dir, filename) {
+      return resolve(prefix, path.join(dir, filename))
+    },
     findByNodeKey(key, tree) {
       let res = []
       if (!tree) return res
@@ -147,21 +159,53 @@ module.exports = {
       for (const k in this.settings.pic) {
         this.settings.pic[k] = pic[k]
       }
+      this.saveCache('img', this.settings.pic)
     },
     async updateVideoInfo() {
       const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, this.logger)
       for (const k in this.settings.video) {
         this.settings.video[k] = video[k]
       }
+      this.saveCache('video', this.settings.video)
     },
     getDirAndFileCount(nodeKeyMap) {
       const dirs = nodeKeyMap.size
-      const files = [...nodeKeyMap.values()].map(_ => _.length).reduce((p, c) => p + c, 0)
+      const files = [...nodeKeyMap.values()].map(_ => (_.files || _).length).reduce((p, c) => p + c, 0)
       return dirs + files
     },
-    async reload() {
-      await this.updatePicInfo()
-      await this.updateVideoInfo()
+    readCache(filename, dir = config.poster_dir) {
+      let file = path.resolve(dir, `${filename}.cache.json`)
+      let cache = {tree: null, nodeKeyMap: null}
+      if (fs.existsSync(file)) {
+        cache = JSON.parse(fs.readFileSync(file).toString())
+        cache.nodeKeyMap = new Map(Object.entries(cache.nodeKeyMap))
+      }
+      return cache
+    },
+    saveCache(filename, data, dir = config.poster_dir) {
+      let file = path.resolve(dir, `${filename}.cache.json`)
+      let cache = {tree: JSON.parse(JSON.stringify(data.tree))}
+      cache.nodeKeyMap = Object.fromEntries(data.nodeKeyMap)
+      this.logger.info(`Save cache to ${file}`)
+      fs.writeFileSync(file, JSON.stringify(cache))
+    },
+    async reload(useCache = false) {
+      if (useCache && config.cache.imgCache) {
+        this.settings.pic = this.readCache('img')
+        if (!this.settings.pic.tree) {
+          await this.updatePicInfo()
+        }
+      } else {
+        await this.updatePicInfo()
+      }
+      if (useCache && config.cache.videoCache) {
+        this.settings.video = this.readCache('video')
+        if (!this.settings.video.tree) {
+          await this.updateVideoInfo()
+        }
+      } else {
+        await this.updateVideoInfo()
+      }
       let imgCount = this.getDirAndFileCount(this.settings.pic.nodeKeyMap)
       let videoCount = this.getDirAndFileCount(this.settings.video.nodeKeyMap)
       return {imgCount, videoCount}
@@ -169,7 +213,7 @@ module.exports = {
   },
   events: {},
   async started() {
-    const {imgCount, videoCount} = await this.reload()
+    const {imgCount, videoCount} = await this.reload(true)
     if (imgCount < config.watchLimit.imgMax) {
       const pic = chokidar.watch(config.pic_dir, config.chokidar)
       pic

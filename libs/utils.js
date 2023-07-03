@@ -11,7 +11,7 @@ const fs = require('fs'),
  * 递归遍历文件夹中图片文件
  * @param baseDir 与欲读取的文件夹做替换，通常为Http服务器的根目录
  * @param dir 欲读取的文件夹
- * @param prefix 前缀
+ * @param prefix
  * @param iRegex 图片正则
  * @param logger logger
  */
@@ -19,14 +19,16 @@ async function readImage(baseDir, dir, prefix, iRegex, logger = console) {
   const startTime = new Date()
   checkDir(baseDir)
   checkDir(dir)
-  prefix = prefix.endsWith('/') ? prefix : prefix + '/'
 
   function func(media) {
-    return media.sort(sortImage)
-      .map(_ => absPathToHttp(_, baseDir, prefix))
+    media.files = media.files.sort(sortImage)
+    return media
+      // .map(_ => path.relative(baseDir, _))
+      // .map(_ => _.replace(/[\\/]/g, '/'))
+      // .map(_ => absPathToHttp(_, baseDir, prefix))
   }
 
-  const info = await read_files(dir, iRegex, func, logger)
+  const info = await read_files(baseDir, dir, iRegex, func, logger)
   logger.warn(`Deal finish, time: ${computedTime(startTime)}`)
   return info
 }
@@ -62,21 +64,22 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
   prefix = prefix.endsWith('/') ? prefix : prefix + '/'
 
   async function func(media) {
-    media = media.sort(sortVideo)
+    media.files = media.files.sort(sortImage)
+    let files = media.files.map(f => path.resolve(baseDir, media.dir, f))
     const res = []
-    for (const m of media) {
+    for (const m of files) {
       const relative_video = path.relative(baseDir, m).replace(/[\\/]/g, '/'),
         k = encodeURI(relative_video)
       let v
       if (cache.has(k)) {
         v = cache.get(k)
-        v.src = replace_host(v.src, prefix)
-        v.video = replace_host(v.video, prefix)
+        // v.src = replace_host(v.src, prefix)
+        // v.video = replace_host(v.video, prefix)
       } else {
         const screenshot = await ffmpeg.screenshot(m, posterFolder),
           resolution = await ffmpeg.getResolution(m),
-          src = absPathToHttp(screenshot, baseDir, prefix),
-          video = absPathToHttp(m, baseDir, prefix)
+          src = encode_url(path.relative(baseDir, screenshot).replace(/[\\/]/g, '/')),
+          video = path.relative(baseDir, m).replace(/[\\/]/g, '/')
         v = {src, ...resolution, video}
       }
       res.push(v)
@@ -97,7 +100,7 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     return res
   }
 
-  const info = await read_files(dir, vRegex, func, logger)
+  const info = await read_files(baseDir, dir, vRegex, func, logger)
   logger.warn(`Deal finish, time: ${computedTime(startTime)}`)
   return info
 }
@@ -112,12 +115,13 @@ function replace_host(pre, target) {
 
 /**
  * dfs递归文件夹
+ * @param baseDir 基准文件夹
  * @param dir{String} 欲读取的文件夹
  * @param regex{RegExp} 欲匹配的文件正则
  * @param mediaFunc{Function} 读取文件以后，需要进行的操作
  * @param logger logger
  */
-async function read_files(dir, regex, mediaFunc, logger = console) {
+async function read_files(baseDir, dir, regex, mediaFunc, logger = console) {
   if (typeof regex === 'string') {
     regex = new RegExp(regex)
   }
@@ -133,17 +137,16 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
     // cpu 密集时，setInterval 不会被按时调用
     let costSec = +((Date.now() - startTime)/1000).toFixed(0)
     if (seconds !== costSec) {
-      logger.info(`Scaning ${dir}: dir: ${dirCount}, file: ${fileCount}, curDir: ${dirPath}...`)
+      logger.info(`Scanning ${dir}: dir: ${dirCount}, file: ${fileCount}, curDir: ${dirPath}...`)
       seconds = costSec
     }
-    
+
     nodeKey++
     let tmpNodeKey = nodeKey,
-      filePath = '',
+      filePath = '', label = path.basename(dirPath),
       media = []
     const files = {
-      nodeKey: tmpNodeKey, header: 'root',
-      label: path.basename(dirPath),
+      nodeKey: tmpNodeKey, header: 'root', label,
       // dir file count
       dirCount: 0,
       fileCount: 0, children: [],
@@ -161,13 +164,15 @@ async function read_files(dir, regex, mediaFunc, logger = console) {
         } else if (i.match(regex) !== null) {
           fileCount++
           files.fileCount++
-          media.push(filePath)
+          media.push(i)
         }
       } catch (e) {
         logger.warn(`process '${filePath}' failed, maybe current file system don't support some char...`, e.message)
         logger.debug(e)
       }
     }
+    let relative = path.relative(baseDir, dirPath)
+    media = {label, dir: relative, files: media}
     media = await mediaFunc(media)
     nodeKeyMap.set(tmpNodeKey, media)
     return files

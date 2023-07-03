@@ -16,6 +16,10 @@ let config = {
   prefix: process.env.PIC_PREFIX || 'http://localhost:8000',
   iRegex: /\S+\.(jpe?g|png|webp|gif|svg|JPE?G)/,
   vRegex: /\S+\.(mp4|MP4|mkv|MKV|flv|FLV|avi|AVI)/,
+  cache: {
+    imgCache: process.env.IMG_CACHE === 'true',
+    videoCache: process.env.VIDEO_CACHE === 'true',
+  },
   // file watch limit
   watchLimit: {
     // images max
