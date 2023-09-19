@@ -145,9 +145,11 @@ async function read_files(baseDir, dir, regex, mediaFunc, logger = console) {
     let tmpNodeKey = nodeKey,
       filePath = '', label = path.basename(dirPath),
       media = []
+    let relative = path.relative(baseDir, dirPath)
     const files = {
       nodeKey: tmpNodeKey, header: 'root', label,
       // dir file count
+      dir: relative,
       dirCount: 0,
       fileCount: 0, children: [],
     }
@@ -171,7 +173,6 @@ async function read_files(baseDir, dir, regex, mediaFunc, logger = console) {
         logger.debug(e)
       }
     }
-    let relative = path.relative(baseDir, dirPath)
     media = {label, dir: relative, files: media}
     media = await mediaFunc(media)
     nodeKeyMap.set(tmpNodeKey, media)

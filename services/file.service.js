@@ -34,21 +34,6 @@ module.exports = {
         }
       },
     },
-    // pic_tree: {
-    //   rest: 'GET /pic_tree',
-    //   handler() {
-    //     let tree = JSON.parse(JSON.stringify(this.settings.pic.tree))
-    //     if (!tree) {
-    //       throw new MoleculerClientError('Please wait for a while', 500)
-    //     } else {
-    //       tree.children.forEach(c => {
-    //         c.lazy = c.dirCount > 0
-    //         c.children = []
-    //       })
-    //       return [tree]
-    //     }
-    //   },
-    // },
     video_tree: {
       rest: 'GET /video_tree',
       handler() {
@@ -70,7 +55,7 @@ module.exports = {
           tree = this.settings.pic.tree
         let node = this.findByNodeKey(+nodeKey, tree)
         return node.length === 0 ? [] : node.children
-      }
+      },
     },
     pic_map: {
       rest: 'POST /pic_map',
@@ -116,6 +101,57 @@ module.exports = {
         })
       },
     },
+    video_del: {
+      rest: 'POST /video_del',
+      params: {
+        nodeKey: {type: 'number', min: 1},
+        dir: {type: 'string'},
+        recursive: {type: 'boolean', default: false},
+      },
+      async handler(ctx) {
+        throw new MoleculerClientError(`Not implemented`, 500)
+      }
+    },
+    pic_del: {
+      rest: 'POST /pic_del',
+      params: {
+        nodeKey: {type: 'number', min: 1},
+        dir: {type: 'string'},
+        recursive: {type: 'boolean', default: false},
+      },
+      async handler(ctx) {
+        const {nodeKey, dir, recursive} = ctx.params,
+          {tree, nodeKeyMap} = this.settings.pic
+        if (!nodeKeyMap) {
+          throw new MoleculerClientError('Please wait for a while', 500)
+        }
+        const obj = nodeKeyMap.get(nodeKey)
+        let dirs = 0, files = 0
+        if (obj) {
+          if (dir === obj.dir) {
+            let node = this.findByNodeKey(nodeKey, tree)
+            let count = this.getCountByNodeKey(node)
+            dirs = count.dirs
+            files = count.files
+            if (dirs > 1 && !recursive) {
+              throw new MoleculerClientError('Please delete the subdirectory first', 500)
+            }
+            const p = path.resolve(config.base_dir, dir)
+            this.logger.warn(`Delete node: ${nodeKey}, recursive: ${recursive}, dir: ${p}`)
+            // 关联删除子文件夹 nodeKey
+            nodeKeyMap.delete(nodeKey)
+            if (fs.existsSync(p)) {
+              fs.rmSync(p, {recursive: true})
+            } else {
+              this.logger.info(`Dir not exists: ${nodeKey}, recursive: ${recursive}, dir: ${p}`)
+            }
+          } else {
+            throw new MoleculerClientError(`dir not match: ${dir} -> ${obj.dir}`, 500)
+          }
+        }
+        return {success: true, dirs, files}
+      },
+    },
     reload: {
       rest: '/reload',
       timeout: 0,
@@ -126,13 +162,16 @@ module.exports = {
         // }
         // await sleep(100 * 1000)
         return this.reload(false)
-      }
-    }
+      },
+    },
   },
   methods: {
     resolveHttp(prefix, dir, filename) {
       return resolve(prefix, path.join(dir, filename))
     },
+    /**
+     * 递归查找 nodeKey
+     */
     findByNodeKey(key, tree) {
       let res = []
       if (!tree) return res
@@ -145,12 +184,6 @@ module.exports = {
             break
           }
         }
-      }
-      if (res.length !== 0) {
-        res.children.forEach(c => {
-          c.lazy = c.dirCount > 0
-          c.children = []
-        })
       }
       return res
     },
@@ -168,10 +201,28 @@ module.exports = {
       }
       this.saveCache('video', this.settings.video)
     },
+    /**
+     * 获取 map 里面的文件夹和文件数量
+     */
     getDirAndFileCount(nodeKeyMap) {
       const dirs = nodeKeyMap.size
       const files = [...nodeKeyMap.values()].map(_ => (_.files || _).length).reduce((p, c) => p + c, 0)
       return dirs + files
+    },
+    getCountByNodeKey(node) {
+      let dirs = 0, files = 0
+      if (node) {
+        dirs += 1
+        files += node.fileCount
+        if (node.children && node.children.length > 0) {
+          for (const child of node.children) {
+            const {dirs: d, files: f} = this.getCountByNodeKey(child)
+            dirs += d
+            files += f
+          }
+        }
+      }
+      return {dirs, files}
     },
     readCache(filename, dir = config.poster_dir) {
       let file = path.resolve(dir, `${filename}.cache.json`)
@@ -209,7 +260,7 @@ module.exports = {
       let imgCount = this.getDirAndFileCount(this.settings.pic.nodeKeyMap)
       let videoCount = this.getDirAndFileCount(this.settings.video.nodeKeyMap)
       return {imgCount, videoCount}
-    }
+    },
   },
   events: {},
   async started() {

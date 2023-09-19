@@ -116,7 +116,7 @@ module.exports = {
         authentication: false,
 
         // Enable authorization. Implement the logic into `authorize` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authorization
-        authorization: true,
+        authorization: process.env.LOCAL_DEV !== 'true',
 
         // The auto-alias feature allows you to declare your route alias directly in your services.
         // The gateway will dynamically build the full routes from service schema.
@@ -238,7 +238,7 @@ module.exports = {
           if (user) {
             // 转换用户类型到用户角色
             const role = user.user_type
-            this.logger.info(`Authenticated via JWT. _id:${user._id}, username: ${user.name}, userType: ${user.user_type}`)
+            this.logger.debug(`Authenticated via JWT. _id:${user._id}, username: ${user.name}, userType: ${user.user_type}`)
             // Reduce user fields (it will be transferred to other nodes)
             ctx.meta.user = pick(user, ['_id', 'name', 'language', 'user_type'])
             // 给 context 添加一些自定义信息
@@ -263,13 +263,13 @@ module.exports = {
           // 用户角色是否在路由权限组里面
           if (routeRoles.some(r => r === userRole)) {
             // Auth success, go next
-            this.logger.info(`Authenticated success, path: ${req.parsedUrl}, allowRoles: ${routeRoles}, userRole: ${userRole}, _id: ${_id}`)
+            this.logger.debug(`Authenticated success, path: ${req.parsedUrl}, allowRoles: ${routeRoles}, userRole: ${userRole}, _id: ${_id}`)
           } else {
             // no right, forbidden
             throw new ForbiddenError()
           }
         } else {
-          this.logger.info(`Authenticated failed, path: ${req.parsedUrl}, allowRoles: ${routeRoles}, userRole: ${userRole}, _id: ${_id}`)
+          this.logger.debug(`Authenticated failed, path: ${req.parsedUrl}, allowRoles: ${routeRoles}, userRole: ${userRole}, _id: ${_id}`)
           throw new UnAuthorizedError()
         }
       } else {
