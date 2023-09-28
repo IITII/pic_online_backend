@@ -172,6 +172,11 @@ module.exports = {
     ],
     onError(req, res, err) {
       // Return with the error as JSON object
+      if (req.url === '/' && err.code === 404) {
+        res.writeHead(302)
+        res.end('<html><meta http-equiv="refresh" content="0;url=/pic"></html>')
+        return
+      }
       res.setHeader('Content-type', 'application/json; charset=utf-8')
 
       if (err.code === 422) {
