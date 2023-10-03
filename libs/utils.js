@@ -284,4 +284,5 @@ module.exports = {
   readImage,
   readVideo,
   allowChars,
+  encode_url,
 }

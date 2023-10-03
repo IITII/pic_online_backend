@@ -11,6 +11,7 @@ const {debounce} = require('lodash'),
 const path = require('path')
 const {resolve} = require('url')
 const fs = require('fs')
+const {encode_url} = require('../libs/utils')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -167,7 +168,7 @@ module.exports = {
   },
   methods: {
     resolveHttp(prefix, dir, filename) {
-      return resolve(prefix, path.join(dir, filename))
+      return encode_url(resolve(prefix, path.join(dir, filename)))
     },
     /**
      * 递归查找 nodeKey
