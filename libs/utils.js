@@ -69,7 +69,7 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     const res = []
     for (const m of files) {
       const relative_video = path.relative(baseDir, m).replace(/[\\/]/g, '/'),
-        k = encodeURIComponent(relative_video)
+        k = encodeURI(relative_video)
       let v
       if (cache.has(k)) {
         v = cache.get(k)
@@ -222,7 +222,7 @@ function encode_url(url) {
   if (process.env.PIC_ENCODE_URL === 'false') {
     return url
   } else {
-    return encodeURIComponent(url)
+    return encodeURI(url)
   }
 }
 
