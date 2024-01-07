@@ -139,7 +139,7 @@ module.exports = {
             const p = path.resolve(config.base_dir, dir)
             this.logger.warn(`Delete node: ${nodeKey}, recursive: ${recursive}, dir: ${p}`)
             // 关联删除子文件夹 nodeKey
-            nodeKeyMap.delete(nodeKey)
+            // nodeKeyMap.delete(nodeKey)
             if (fs.existsSync(p)) {
               fs.rmSync(p, {recursive: true})
             } else {
