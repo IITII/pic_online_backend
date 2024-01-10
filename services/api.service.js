@@ -71,7 +71,7 @@ module.exports = {
       {
         // admin only, no limit
         path: '/dev', meta: {roles: ['admin']},
-        whitelist: ['$node.*'],
+        whitelist: ['$node.*', 'openapi.*'],
         aliases: {},
         mergeParams: true, logging: true,
         authentication: false, authorization: true,
