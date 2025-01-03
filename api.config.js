@@ -20,6 +20,7 @@ let config = {
     imgCache: process.env.IMG_CACHE === 'true',
     videoCache: process.env.VIDEO_CACHE === 'true',
   },
+  ignoreFilePrefix: '. @eaDir',
   // file watch limit
   watchLimit: {
     // images max
@@ -85,6 +86,8 @@ if (fs.existsSync(config.moleculer.https.key) && fs.existsSync(config.moleculer.
 } else {
   config.moleculer.https = false
 }
+
+config.ignoreFilePrefix = config.ignoreFilePrefix.trim().split(/\s+/).filter(_ => !!_)
 
 let proxy = process.env.PROXY || ''
 proxy = proxy.replace(/https?:\/\//, '')

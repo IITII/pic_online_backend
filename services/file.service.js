@@ -188,14 +188,14 @@ module.exports = {
       return res
     },
     async updatePicInfo() {
-      const pic = await readImage(config.base_dir, config.pic_dir, config.prefix, config.iRegex, this.logger)
+      const pic = await readImage(config.base_dir, config.pic_dir, config.prefix, config.iRegex, config.ignoreFilePrefix, this.logger)
       for (const k in this.settings.pic) {
         this.settings.pic[k] = pic[k]
       }
       this.saveCache('img', this.settings.pic)
     },
     async updateVideoInfo() {
-      const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, this.logger)
+      const video = await readVideo(config.base_dir, config.video_dir, config.poster_dir, config.prefix, config.vRegex, config.ignoreFilePrefix, this.logger)
       for (const k in this.settings.video) {
         this.settings.video[k] = video[k]
       }

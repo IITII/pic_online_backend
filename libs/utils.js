@@ -15,7 +15,7 @@ const fs = require('fs'),
  * @param iRegex 图片正则
  * @param logger logger
  */
-async function readImage(baseDir, dir, prefix, iRegex, logger = console) {
+async function readImage(baseDir, dir, prefix, iRegex, ignoreFilePrefix, logger = console) {
   const startTime = new Date()
   checkDir(baseDir)
   checkDir(dir)
@@ -28,7 +28,7 @@ async function readImage(baseDir, dir, prefix, iRegex, logger = console) {
       // .map(_ => absPathToHttp(_, baseDir, prefix))
   }
 
-  const info = await read_files(baseDir, dir, iRegex, func, logger)
+  const info = await read_files(baseDir, dir, iRegex, func, ignoreFilePrefix, logger)
   logger.warn(`Deal finish, time: ${computedTime(startTime)}`)
   return info
 }
@@ -42,7 +42,7 @@ async function readImage(baseDir, dir, prefix, iRegex, logger = console) {
  * @param vRegex 视频正则
  * @param logger logger
  */
-async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = console) {
+async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, ignoreFilePrefix, logger = console) {
   let startTime = new Date(),
     cacheFilename = 'cache.txt',
     cacheFilePath = path.resolve(posterFolder, cacheFilename),
@@ -100,7 +100,7 @@ async function readVideo(baseDir, dir, posterFolder, prefix, vRegex, logger = co
     return res
   }
 
-  const info = await read_files(baseDir, dir, vRegex, func, logger)
+  const info = await read_files(baseDir, dir, vRegex, func, ignoreFilePrefix, logger)
   logger.warn(`Deal finish, time: ${computedTime(startTime)}`)
   return info
 }
@@ -121,7 +121,7 @@ function replace_host(pre, target) {
  * @param mediaFunc{Function} 读取文件以后，需要进行的操作
  * @param logger logger
  */
-async function read_files(baseDir, dir, regex, mediaFunc, logger = console) {
+async function read_files(baseDir, dir, regex, mediaFunc, ignoreFilePrefix, logger = console) {
   if (typeof regex === 'string') {
     regex = new RegExp(regex)
   }
@@ -155,7 +155,8 @@ async function read_files(baseDir, dir, regex, mediaFunc, logger = console) {
     }
     for (const i of fs.readdirSync(dirPath).sort()) {
       filePath = dirPath + path.sep + i
-      if (i.startsWith('.')) {
+      if (ignoreFilePrefix.some(_ => i.startsWith(_))) {
+        logger.debug(`ignore file: ${filePath}...`)
         continue
       }
       try {
